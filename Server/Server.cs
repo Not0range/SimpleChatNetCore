@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Linq;
 
 namespace Server
 {
@@ -22,7 +23,7 @@ namespace Server
         CancellationTokenSource cancellationToken;
 
         TcpListener server;
-        public Status status;
+        Status status;
         Action<string> logger;
         Dictionary<User, Socket> users;
 
@@ -249,6 +250,15 @@ namespace Server
                     socket.Send(new byte[1] { 249 });
 
             }
+        }
+
+        public string[] GetUsers()
+        {
+            string[] strs = new string[users.Count];
+            int i = 0;
+            foreach (User u in users.Keys)
+                strs[i++] = u.username;
+            return strs;
         }
 
         private class Message

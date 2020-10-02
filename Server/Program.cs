@@ -11,6 +11,7 @@ namespace Server
         {
             Server server = new Server(Console.WriteLine);
             server.Start();
+            Console.WriteLine("введите help или ? для вызова справки");
             while(true)
             {
                 string read = Console.ReadLine();
@@ -23,6 +24,17 @@ namespace Server
                         break;
                     case "clear":
                         Console.Clear();
+                        break;
+                    case "list":
+                    case "users":
+                    case "online":
+                        Console.WriteLine(string.Join(Environment.NewLine, server.GetUsers()));
+                        break;
+                    case "help":
+                    case "?":
+                        Console.WriteLine("close/stop/exit - завершить работу сервера");
+                        Console.WriteLine("clear - очистить консоль");
+                        Console.WriteLine("list/users/online - вывод списка подключенных пользователей");
                         break;
                 }
             }
