@@ -17,6 +17,10 @@ namespace Server
         const int SendMessage = 3;
         #endregion
 
+        Task heartbeats;
+
+        CancellationTokenSource cancellationToken;
+
         TcpListener server;
         public Status status;
         Action<string> logger;
@@ -35,6 +39,9 @@ namespace Server
             status = Status.Working;
             logger("Запуск сервера");
             server.Start(15);
+            cancellationToken = new CancellationTokenSource();
+            heartbeats = new Task(TimeoutKick);
+            heartbeats.Start();
             while (true)
             {
                 try
@@ -62,6 +69,24 @@ namespace Server
             while (server.Pending()) ;
             server.Stop();
             logger("Остановка сервера");
+        }
+
+        private void TimeoutKick()
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                Thread.Sleep(30000);
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+                foreach (User u in users.Keys)
+                {
+                    if ((DateTime.Now - u.lastTime).TotalSeconds > 30)
+                    {
+                        users.Remove(u);
+                        logger($"Превышение времени ожидания для {u.username}");
+                    }
+                }
+            }
         }
 
         private void Handler(Socket socket)
