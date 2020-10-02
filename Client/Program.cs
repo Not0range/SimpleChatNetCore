@@ -42,7 +42,7 @@ namespace Client
             Console.Write("Введите имя пользователя: ");
             Console.CursorTop = 2;
             Console.CursorLeft = 0;
-            Console.WriteLine("↑/↓ - выбор собеседника");
+            Console.WriteLine("ArrowUp/ArrowDown - выбор собеседника");
             Console.WriteLine("Enter - открыть чат/отправить сообщение");
             Console.WriteLine("Escape - вернуться к выбору собеседника");
             Console.WriteLine("Ctrl+C/Ctrl+Break - выйти из чата и закрыть программу");
@@ -50,8 +50,10 @@ namespace Client
             Console.CursorTop = 0;
             Console.CursorLeft = 26;
             string username;
-            while (true)
+            bool b;
+            do
             {
+                b = true;
                 username = Console.ReadLine();
                 if (username.Length < 10)
                 {
@@ -61,22 +63,25 @@ namespace Client
                             break;
 
                     if (i == username.Length)
-                        break;
+                        b = false;
                 }
 
-                Console.Write("Введите допустимое имя пользователя");
-                Console.CursorTop = 0;
-                Console.CursorLeft = 26;
-                Console.Write(new string(' ', username.Length));
-                Console.CursorLeft = 26;
-            }
+                client = new Client(username);
+                b = !client.Connect();
+
+                if (b)
+                {
+                    Console.Write("Введите допустимое имя пользователя");
+                    Console.CursorTop = 0;
+                    Console.CursorLeft = 26;
+                    Console.Write(new string(' ', username.Length));
+                    Console.CursorLeft = 26;
+                }
+            } while (b);
 
             Console.Title = "В системе как " + username;
             Console.Clear();
             Console.CursorVisible = false;
-
-            client = new Client(username);
-            client.Connect();
 
             Console.CancelKeyPress += (s, e) =>
             {
